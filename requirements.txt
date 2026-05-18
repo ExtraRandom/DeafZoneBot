@@ -5,3 +5,4 @@ python-dateutil  # used in time_formatting util only
 # beautifulsoup4
 # yt-dlp
 pytz
+# python-dotenv

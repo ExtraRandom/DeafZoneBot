@@ -44,12 +44,12 @@ class DeafZoneBot(commands.Bot):
         if check:  # testing mode
             super().__init__(debug_guilds=check,
                              description="Bot Developed by @Extra_Random#2564\n"
-                                         "Source code: https://github.com/ExtraRandom/RobotExtra",
+                                         "Source code: https://github.com/ExtraRandom/DeafZoneBot",
                              intents=d_intents,
                              command_prefix=commands.when_mentioned)
         else:  # live build
             super().__init__(description="Bot Developed by @Extra_Random#2564\n"
-                                         "Source code: https://github.com/ExtraRandom/RobotExtra",
+                                         "Source code: https://github.com/ExtraRandom/DeafZoneBot",
                              intents=d_intents)
 
     async def on_ready(self):

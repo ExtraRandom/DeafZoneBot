@@ -76,7 +76,7 @@ class Admin(commands.Cog):
         await ctx.respond(embed=result)
 
     @commands.slash_command()
-    @commands.has_permissions(administrator=True)
+    @perms.is_dev()
     async def log(self, ctx):
         """Get the latest log file"""
         await ctx.defer()
