@@ -1,0 +1,8 @@
+/logs/*.txt
+/db/*.sqlite
+/configs/*.*
+/.idea
+/cogs/data/purge.txt
+/cogs/ignored_cogs
+/cogs/ignored_cogs/*.py
+/.ven*

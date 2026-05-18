@@ -1,0 +1,65 @@
+from discord.ext import commands
+import discord
+from cogs.utils import errors
+
+
+def is_server_owner():
+    def predicate(ctx):
+        return ctx.message.author.id == ctx.message.channel.guild.owner
+    return commands.check(predicate)
+
+
+def is_dev():
+    def predicate(ctx):
+        if isinstance(ctx, discord.ext.commands.Context):
+            return ctx.message.author.id == 92562410493202432
+        elif isinstance(ctx, discord.ApplicationContext):
+            if ctx.author.id == 92562410493202432:
+                return True
+            else:
+                raise discord.ext.commands.CheckFailure
+        else:
+            return False
+    return commands.check(predicate)
+
+
+def is_server_owner_or_dev():
+    def predicate(ctx):
+        if ctx.message.author.id == ctx.message.channel.guild.owner or ctx.message.author.id == 92562410493202432:
+            return True
+        else:
+            return False
+    return commands.check(predicate)
+
+
+def is_admin():
+    def predicate(ctx):
+        if isinstance(ctx, discord.ext.commands.Context):
+            return ctx.message.author.guild_permissions.administrator
+        elif isinstance(ctx, discord.ApplicationContext):
+            if ctx.author.guild_permissions.administrator:
+                return True
+            else:
+                raise discord.ext.commands.CheckFailure
+        else:
+            return False
+    return commands.check(predicate)
+
+
+def is_in_a_server():
+    def predicate(ctx):
+        if isinstance(ctx.message.channel, discord.DMChannel):
+            raise discord.ext.commands.NoPrivateMessage
+        else:
+            return True
+    return commands.check(predicate)
+
+
+def is_in_dms():
+    def predicate(ctx):
+        if isinstance(ctx.message.channel, discord.DMChannel):
+            return True
+        else:
+            raise discord.ext.commands.PrivateMessageOnly
+
+    return commands.check(predicate)
