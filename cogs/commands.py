@@ -34,13 +34,6 @@ class Commands(commands.Cog):
         except Exception as e:
             await ctx.respond("Error getting bot uptime. Reason: {}".format(type(e).__name__))
 
-    @commands.slash_command()
-    @perms.is_dev()
-    async def invite(self, ctx):
-        """Get bot invite link"""
-        await ctx.respond("https://discord.com/oauth2/authorize?client_id=571947888662413313&scope=bot",
-                          ephemeral=True)
-
     @commands.slash_command(name="server")
     @commands.guild_only()
     async def server(self, ctx):

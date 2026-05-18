@@ -23,7 +23,7 @@ class General(commands.Cog):
         self.central_europe_tz = ZoneInfo("Europe/Warsaw")
         self.central_europe_desc = "Central Europe"
 
-        self.time_format = "%H:%M %Z" # "%I:%M%p %Z"  #
+        self.time_format = "%H:%M %Z" # "%I:%M%p %Z"
 
     @staticmethod
     def get_gmt_offset_neat(time: datetime.datetime, timezone):
