@@ -85,7 +85,7 @@ class Commands(commands.Cog):
         bot_owner = bot_info.owner.mention
         discord_version = discord.__version__
         python_version = py_v()
-        github_link = "https://github.com/ExtraRandom/RobotExtra"
+        github_link = "https://github.com/ExtraRandom/DeafZoneBot"
         uptime = timefmt.time_ago(self.bot.start_time)
         avatar = self.bot.user.avatar.url
 

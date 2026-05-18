@@ -5,7 +5,7 @@ Log in
 sudo docker login
 ```
 
-Setting up a new builder
+Setting up a new builder (if building for ARM)
 ```shell
 # check existing builders
 docker buildx ls
@@ -19,7 +19,7 @@ docker buildx create \
 Build (x86 and arm)
 ```shell
 sudo docker buildx build \
-  -t extrarandom/dz_bot:master \
+  -t extrarandom/dz_bot:latest \
   --progress plain \
   --platform linux/amd64,linux/arm64 \
   --push \
@@ -29,7 +29,7 @@ sudo docker buildx build \
 Build (x86 only)
 ```shell
 sudo docker buildx build \
-  -t extrarandom/dz_bot:master \
+  -t extrarandom/dz_bot:latest \
   --progress plain \
   --platform linux/amd64 \
   --push \
