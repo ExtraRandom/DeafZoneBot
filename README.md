@@ -8,4 +8,6 @@ This will create an file where you can then enter the bot token.
 
 [Docker Build instructions](docs/docker_build.md)
 
+[Settings JSON Setup](docs/settings.md)
+
 [Docker Run instructions](docs/docker_run.md)
