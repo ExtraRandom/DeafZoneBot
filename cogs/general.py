@@ -1,10 +1,5 @@
 from discord.ext import commands
-import re
-from cogs.utils import time_formatting as timefmt, IO
 import datetime
-from cogs.utils import perms
-import discord
-
 from zoneinfo import ZoneInfo
 
 class General(commands.Cog):
@@ -23,12 +18,9 @@ class General(commands.Cog):
         self.central_europe_tz = ZoneInfo("Europe/Warsaw")
         self.central_europe_desc = "Central Europe"
 
-        self.time_format = "%H:%M %Z" # "%I:%M%p %Z"
-
-    @staticmethod
-    def get_gmt_offset_neat(time: datetime.datetime, timezone):
-        offset = time.astimezone(timezone).strftime("%z")
-
+        self.time_format = "%H:%M %Z"
+        # "%H:%M %Z" # 24 hour
+        # "%I:%M%p %Z" # 12 hour
 
 
     @commands.slash_command(name="timezones")

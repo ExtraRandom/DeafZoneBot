@@ -17,7 +17,7 @@ def base_directory():
 async def find_member_from_id_or_mention(ctx: discord.ext.commands.Context,
                                          user: Optional[Union[int, str, discord.Member]]) -> Optional[discord.Member]:
     """
-    Takes message context to check for mentions and user input to check if its an id and returns
+    Takes message context to check for mentions and user input to check if it's an id and returns
     the member object should it find one, or none if it does not
 
     :param ctx: Context

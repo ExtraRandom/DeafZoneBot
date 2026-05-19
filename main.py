@@ -18,7 +18,7 @@ def testing_check():
         return []
     else:
         if debug in ["true", "True", "t", "T", "y", "Y", "yes", "Yes", True]:
-            guilds = IO.fetch_from_settings("testing", "ids", "DISCORD_DEBUG_GUILDS")
+            guilds = IO.fetch_from_settings("testing", "ids", "DISCORD_DEBUG_GUILD")
             if type(guilds) == list:
                 print ("Debug guilds set. Debug Guilds will be On")
                 return guilds
