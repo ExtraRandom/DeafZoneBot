@@ -37,11 +37,13 @@ class DeafZoneBot(commands.Bot):
     def __init__(self):
         self.start_time = None
         self.reconnect_time = None
+        self.debug_mode = False
 
         d_intents = discord.Intents.all()
 
         check = testing_check()
         if check:  # testing mode
+            self.debug_mode = True
             super().__init__(debug_guilds=check,
                              description="Bot Developed by @Extra_Random#2564\n"
                                          "Source code: https://github.com/ExtraRandom/DeafZoneBot",
@@ -64,7 +66,6 @@ class DeafZoneBot(commands.Bot):
         bot_msg = message.author.bot
         if bot_msg is True:
             return
-
         await self.process_commands(message)
 
     async def on_application_command_error(
