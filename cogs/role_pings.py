@@ -13,11 +13,11 @@ class RolePing(commands.Cog):
     async def lfg_autocomplete(self, ctx: AutocompleteContext):
         final = []
 
-        print(ctx.value.lower())
+        # print(ctx.value.lower())
 
         data = role_lookup.game_roles_basic
         for game in data.keys():
-            print(game)
+            # print(game)
             if game is not None:
                 if ctx.value.lower() in game.lower():
                     final.append(OptionChoice(name=game, value=data[game]))
@@ -76,7 +76,7 @@ class RolePing(commands.Cog):
         msg = ""
 
         for game in role_lookup.game_roles_basic.keys():
-            print(game)
+            # print(game)
 
             game_info = role_lookup.game_roles[role_lookup.game_roles_basic[game]]
             msg += f"{game_info['game_name_full']} - <@&{game_info[lookup_string]}>\n"
