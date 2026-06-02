@@ -1,0 +1,3 @@
+deafzone_guild_id = 876219823070248980
+testing_guild_id = 1505625736881635500
+

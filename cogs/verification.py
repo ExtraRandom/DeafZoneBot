@@ -1,7 +1,5 @@
 import discord
 from discord.ext import commands
-import datetime
-from zoneinfo import ZoneInfo
 
 class Verification(commands.Cog):
     def __init__(self, bot):
@@ -69,7 +67,7 @@ class Verification(commands.Cog):
                 user_has_quarantine_role = True
                 q_role = role
 
-            print(role.id, role.name)
+            # print(role.id, role.name)
 
         # make sure bot has the manage roles permission
         bot_member = ctx.guild.me
