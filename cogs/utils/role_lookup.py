@@ -1,3 +1,9 @@
+
+birthday = {
+    "deafzone_role_id": 1001711698476019753,
+    "testing_role_id": 1512741400574300160,
+}
+
 game_roles_basic = {
     "Call of Duty": "COD",
     "Bloons TD6": "BTD6",

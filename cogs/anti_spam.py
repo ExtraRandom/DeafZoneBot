@@ -11,6 +11,10 @@ class AntiSpam(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
+
+        self.anti_spam_enabled = True
+
+
         self.scam_hashes = {}
 
         for img_path in Path("cogs/data/bad_images").glob("*"):
@@ -28,6 +32,9 @@ class AntiSpam(commands.Cog):
         return Image.open(io.BytesIO(data))
 
     async def spam_check(self, message: discord.Message):
+        if not self.anti_spam_enabled:
+            return
+
         if message.author.bot:
             return
 
@@ -51,28 +58,37 @@ class AntiSpam(commands.Cog):
                         lowest_distance = distance
 
                     if distance == 0:
-                        msg+= f"image is identical to a known bad image (dist: {distance})\n"
+                        msg+= f"image is identical to a known bad image (dist: {distance}) {image_hash}\n"
                     elif 6 > distance > 1:
-                        msg+= f"image is extremely similar to a known bad image (dist: {distance})\n"
+                        msg+= f"image is extremely similar to a known bad image (dist: {distance}) {image_hash}\n"
                     elif 11 > distance > 6:
-                        msg+= f"image is somewhat similar to a known bad image (dist: {distance})\n"
+                        msg+= f"image is somewhat similar to a known bad image (dist: {distance}) {image_hash}\n"
                     elif 19 > distance > 11:
-                        msg+= f"image is possibly related or similar to a known bad image (dist: {distance})\n"
+                        msg+= f"image is possibly related or similar to a known bad image (dist: {distance}) {image_hash}\n"
                     elif distance > 19:
                         pass
                         # msg += f"image is likely unrelated to a known bad image (dist: {distance})\n"
 
-
-                    # msg += f"distance to image {image_hash} is {distance}\n"
-
-                await message.reply(msg)
-
-                if lowest_distance < 20:
-                    await message.reply("no no image detected, deleting")
+                if lowest_distance < 11:
+                    await message.reply(msg+"\nbad image detected, deleting")
                     await message.delete()
-
-
+                    return
+                else:
+                    await message.reply(msg)
+                    return
         return
+
+
+    @commands.slash_command(name="anti_spam_off")
+    async def pause_anti_spam(self, ctx: discord.ApplicationContext):
+        self.anti_spam_enabled = False
+        await ctx.respond("paused anti spam")
+
+    @commands.slash_command(name="anti_spam_on")
+    async def resume_anti_spam(self, ctx: discord.ApplicationContext):
+        self.anti_spam_enabled = True
+        await ctx.respond("enabled anti spam")
+
 
 
 def setup(bot):

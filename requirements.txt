@@ -6,3 +6,8 @@ python-dateutil  # used in time_formatting util only
 # yt-dlp
 pytz
 # python-dotenv
+
+# anti spam related
+imagehash
+pillow
+aiohttp
