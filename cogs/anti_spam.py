@@ -78,13 +78,15 @@ class AntiSpam(commands.Cog):
                     return
         return
 
+    antispam = discord.commands.SlashCommandGroup("antispam", "Anti Spam Related Commands")
 
-    @commands.slash_command(name="anti_spam_off")
+
+    @antispam.command(name="off")
     async def pause_anti_spam(self, ctx: discord.ApplicationContext):
         self.anti_spam_enabled = False
         await ctx.respond("paused anti spam")
 
-    @commands.slash_command(name="anti_spam_on")
+    @antispam.command(name="on")
     async def resume_anti_spam(self, ctx: discord.ApplicationContext):
         self.anti_spam_enabled = True
         await ctx.respond("enabled anti spam")
