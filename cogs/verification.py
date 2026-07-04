@@ -223,7 +223,7 @@ class Verification(commands.Cog):
 
         # log in a channel (probably a staff related one)
         staff_channel = await ctx.guild.fetch_channel(self.log_channel)
-        embed = discord.Embed(title="User Rejected", color=discord.Color.green())
+        embed = discord.Embed(title="User Rejected", color=discord.Color.red())
         embed.add_field(name="User", value=user.mention)
         embed.add_field(name="User ID", value=str(user.id))
         embed.add_field(name="Reason", value=reason)

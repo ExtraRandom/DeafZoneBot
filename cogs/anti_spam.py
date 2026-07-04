@@ -41,9 +41,7 @@ class AntiSpam(commands.Cog):
         # TODO decide on check against images that are linked (maybe only if a discord link?)
         for file in message.attachments:
             # print(file.content_type)
-
             lowest_distance = 100
-
             msg = ""
 
             if file.content_type in ["image/webp", "image/png", "image/jpeg"]:
@@ -78,8 +76,8 @@ class AntiSpam(commands.Cog):
                     return
         return
 
-    antispam = discord.commands.SlashCommandGroup("antispam", "Anti Spam Related Commands")
 
+    antispam = discord.commands.SlashCommandGroup("antispam", "Anti Spam Related Commands")
 
     @antispam.command(name="off")
     async def pause_anti_spam(self, ctx: discord.ApplicationContext):
@@ -90,7 +88,6 @@ class AntiSpam(commands.Cog):
     async def resume_anti_spam(self, ctx: discord.ApplicationContext):
         self.anti_spam_enabled = True
         await ctx.respond("enabled anti spam")
-
 
 
 def setup(bot):
