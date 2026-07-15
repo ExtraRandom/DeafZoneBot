@@ -72,7 +72,10 @@ class AntiSpam(commands.Cog):
                     await message.delete()
                     return
                 else:
-                    await message.reply(msg)
+                    if msg:
+                        await message.reply(msg)
+                    else:
+                        return
                     return
         return
 
