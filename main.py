@@ -45,12 +45,12 @@ class DeafZoneBot(commands.Bot):
         if check:  # testing mode
             self.debug_mode = True
             super().__init__(debug_guilds=check,
-                             description="Bot Developed by @Extra_Random#2564\n"
+                             description="Bot Developed by Extra_Random\n"
                                          "Source code: https://github.com/ExtraRandom/DeafZoneBot",
                              intents=d_intents,
                              command_prefix=commands.when_mentioned)
         else:  # live build
-            super().__init__(description="Bot Developed by @Extra_Random#2564\n"
+            super().__init__(description="Bot Developed by Extra_Random\n"
                                          "Source code: https://github.com/ExtraRandom/DeafZoneBot",
                              intents=d_intents)
 
@@ -199,8 +199,13 @@ class DeafZoneBot(commands.Bot):
                 "keys": {
                     "token": None,
                 },
-                "cogs":
-                    {
+                "cogs": {
+                },
+                "mongo": { # default values, do not use
+                    "host": "localhost",
+                    "port": 27017,
+                    "user": "root",
+                    "password": "example",
                 }
             }
         sd_len = len(settings_data)

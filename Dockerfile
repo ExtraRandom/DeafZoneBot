@@ -16,10 +16,6 @@ ENV PYTHONDONTWRITEBYTECODE=1
 # the application crashes without emitting any logs due to buffering.
 ENV PYTHONUNBUFFERED=1
 
-# Set to TRUE or FALSE
-# ENV USE_ENV_VALUES=TRUE
-# probably a bit silly tbh
-
 ENV DOCKER=TRUE
 
 # not sure whether to use these so have left them commented for now

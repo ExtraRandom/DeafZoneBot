@@ -17,6 +17,31 @@ settings_file_path = os.path.join(cwd, "configs", "settings.json")
 debug = False
 
 
+def fetch_mongo_url_from_settings():
+    data = read_settings_as_json()
+    if data is None:
+        return None
+
+    try:
+        if debug:
+            msg = "fetching mongo url"
+            print(msg)
+            Logger.log_write(msg)
+
+        mongo_data = data['mongo']
+        url = f"mongodb://{mongo_data['user']}:{mongo_data['password']}@{mongo_data['host']}:{mongo_data['port']}"
+        if debug:
+            msg = f"mongo url is {url}"
+            print(msg)
+            Logger.log_write(msg)
+        return url
+
+    except IndexError:
+        return None
+
+
+
+
 def fetch_from_settings(top_key: str, inner_key: str, docker_env_name: str = ""):
     """Fetch a single setting from settings.json"""
     if docker_env_name is not None:
