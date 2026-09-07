@@ -8,8 +8,6 @@ import discord
 from platform import python_version as py_v
 
 from cogs.utils.logger import Logger
-
-
 # import re
 # from time import time
 
@@ -89,7 +87,7 @@ class Commands(commands.Cog):
         res.add_field(name="Python Version", value="{}".format(python_version))
         res.add_field(name="Source Code", value="{}".format(github_link))
         res.add_field(name="Uptime", value="{}".format(uptime))
-        res.set_footer(text="Currently being a robot in {} servers".format(len(self.bot.guilds)))
+        # res.set_footer(text="Currently in {} servers".format(len(self.bot.guilds)))
 
         res.set_thumbnail(url=avatar)
 

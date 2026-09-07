@@ -17,9 +17,8 @@ AUTO_DELETE_LONG = 30
 class RolePing(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.check_loop.start()
+        # self.check_loop.start()
 
-        self.channel_for_ping_id = 1505872906666905670
 
     async def lfg_autocomplete(self, ctx: AutocompleteContext):
         final = []
@@ -95,7 +94,7 @@ class RolePing(commands.Cog):
         await ctx.respond(msg)
         return
 
-    @tasks.loop(seconds=5)
+    @tasks.loop(seconds=10)
     async def check_loop(self):
         if self.bot.is_ready():
             # print("practice check")

@@ -10,12 +10,11 @@ import io
 class AntiSpam(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-
-
         self.anti_spam_enabled = True
-
-
         self.scam_hashes = {}
+
+        self.scam_deletes_log = None
+
 
         for img_path in Path("cogs/data/bad_images").glob("*"):
             img = Image.open(img_path)
@@ -79,7 +78,7 @@ class AntiSpam(commands.Cog):
                     return
         return
 
-
+    """
     antispam = discord.commands.SlashCommandGroup("antispam", "Anti Spam Related Commands")
 
     @antispam.command(name="off")
@@ -91,7 +90,7 @@ class AntiSpam(commands.Cog):
     async def resume_anti_spam(self, ctx: discord.ApplicationContext):
         self.anti_spam_enabled = True
         await ctx.respond("enabled anti spam")
-
+    """
 
 def setup(bot):
     b = AntiSpam(bot)
