@@ -68,9 +68,7 @@ class DeafZoneBot(commands.Bot):
             return
         await self.process_commands(message)
 
-    async def on_application_command_error(
-        self, ctx: discord.ApplicationContext, exception: discord.DiscordException
-    ) -> None:
+    async def on_application_command_error(self, ctx: discord.ApplicationContext, exception: discord.DiscordException) -> None:
         cmd = ctx.command
 
         if isinstance(exception, commands.errors.CheckFailure):
@@ -88,9 +86,7 @@ class DeafZoneBot(commands.Bot):
                 pass
             return
 
-    async def on_command_error(
-            self, ctx: discord.ext.commands.Context, error: discord.DiscordException
-    ) -> None:
+    async def on_command_error(self, ctx: discord.ext.commands.Context, error: discord.DiscordException) -> None:
         channel = ctx.message.channel
         cmd = ctx.command
 
@@ -253,10 +249,7 @@ class DeafZoneBot(commands.Bot):
         """
         Write settings to file after ensure all fields exists
         This prevents a new/updated cog from failing to load the first time if a new settings is added,
-        and it attempts to get that setting on cog start (as of writing, this only applies to home assistant
-        as it gets the api key on cog start) 
-        
-        HOME ASSISTANT COG REMOVED - will need to decide if this is still needed
+        and it attempts to get that setting on cog start 
         """
 
         """Load cogs"""

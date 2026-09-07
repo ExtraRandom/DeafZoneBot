@@ -1,58 +1,72 @@
 import discord
 from discord.ext import commands
 import datetime
-
+import mongo
 
 class Monitor(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.log_channel_id = 1516384364907466793
-        self.monitor_vc_id = 1516384130114261032
 
-        self.log_channel: discord.TextChannel = None
+    @staticmethod
+    def get_guild(before, after):
+        if before.channel:
+            return before.channel.guild.id
+        if after.channel:
+            return after.channel.guild.id
+        return None
 
-    async def on_voice_state_update(self, member, before: discord.VoiceState, after: discord.VoiceState):
-        if self.log_channel == None:
-            self.log_channel = self.bot.get_channel(self.log_channel_id)
-
+    async def on_voice_state_update(self, member: discord.Member, before: discord.VoiceState, after: discord.VoiceState):
         if before.channel == after.channel:
-            print("was a voice state change rather than channel change, skipping logging")
+            # print("was a voice state change rather than channel change, skipping logging")
             return
 
-        embed = discord.Embed(title="voice update", color=discord.Color.blue())
-        embed.add_field(name="member", value=member.mention)
 
-        if before.channel is not None:
-            embed.add_field(name="Previous Channel", value=before.channel.mention)
-        else:
-            embed.add_field(name="Previous Channel", value="No VC")
+        log_id = mongo.get_channel(Monitor.get_guild(before, after), "vc_updates_log")
+        if log_id is None:
+            print(f"{before.channel.guild.name} ({before.channel.guild.id}) does not have vc_updates_log channel set")
+            return
+        log_channel = self.bot.get_channel(int(log_id))
 
-        if after.channel is not None:
-            embed.add_field(name="New Channel", value=after.channel.mention)
-        else:
-            embed.add_field(name="New Channel", value="No VC")
+        embed = discord.Embed()
+
+        if before.channel is not None and after.channel is None:
+            embed.colour = discord.Colour.red()
+            embed.description = f"User {member.mention} ({member.name})\nLeft Voice Channel {before.channel.mention} ({before.channel.name})"
+        elif before.channel is None and after.channel is not None:
+            embed.colour = discord.Colour.green()
+            embed.description = f"User {member.mention} ({member.name})\nJoined Voice channel {after.channel.mention} ({after.channel.name})"
+        elif before.channel is not None and after.channel is not None:
+            embed.colour = discord.Colour.blue()
+            embed.description = f"User {member.mention} ({member.name}) Moved Voice Channels\nFrom {before.channel.mention} ({before.channel.name})\nTo {after.channel.mention} ({after.channel.name})"
+
+        embed.set_author(name=f"{member.display_name}", icon_url=member.display_avatar)
 
         embed.timestamp = datetime.datetime.now()
+        embed.set_footer(text=f"ID: {member.id}")
 
-        await self.log_channel.send(embed=embed)
+        await log_channel.send(embed=embed)
 
-
-        #await self.log_channel.send(f"{member.display_name} changed from \n'{before.channel}' with self muted: {before.self_mute} \n"
-        #                            f"to '{after.channel}' with self muted: {after.self_mute} \n")
-
-
-        print(member)
-        print(before)
-        print(after)
 
     async def on_voice_channel_status_update(self, channel, before, after):
-        if self.log_channel == None:
-            self.log_channel = self.bot.get_channel(self.log_channel_id)
+        log_id = mongo.get_channel(channel.guild.id, "vc_updates_log")
+        if log_id is None:
+            print(f"{channel.guild.name} ({channel.guild.id}) does not have vc_updates_log channel set")
+            return
+
+        # print(log_id)
+        log_channel = self.bot.get_channel(int(log_id))
+        # print(log_channel)
 
         if before == after:
             return
 
-        await self.log_channel.send(f"'{channel}' status changed from '{before}' to '{after}'")
+        embed = discord.Embed(title="Voice Channel Status Update", color=discord.Color.blue())
+        embed.add_field(name="Voice Channel", value=f"{channel.name}\n{channel.mention}")
+        embed.add_field(name="Previous Status", value=before)
+        embed.add_field(name="New Status", value=after)
+        embed.timestamp = datetime.datetime.now()
+        # await log_channel.send(f"'{channel}' status changed from '{before}' to '{after}'")
+        await log_channel.send(embed=embed)
 
 def setup(bot):
     b = Monitor(bot)
