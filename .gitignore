@@ -6,3 +6,5 @@
 /cogs/ignored_cogs
 /cogs/ignored_cogs/*.py
 /.ven*
+
+/cogs/removed/*.*
