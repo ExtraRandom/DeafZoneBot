@@ -1,10 +1,10 @@
 from discord.ext import commands
-from datetime import datetime
+import datetime
 from cogs.utils import perms
 from cogs.utils import time_formatting as timefmt, ez_utils
 from cogs.utils.logger import Logger
 import discord
-import re
+# import re
 import os
 
 
@@ -44,7 +44,7 @@ def user_info_embed(target: discord.Member):
                                                  timefmt.time_ago(target.joined_at, brief=True)))
 
     result.set_footer(text="ID: {}".format(target.id))
-    result.timestamp = datetime.now()
+    result.timestamp = datetime.datetime.now(datetime.UTC)
 
     return result
 
