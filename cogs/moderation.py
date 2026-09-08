@@ -91,15 +91,15 @@ class Moderation(commands.Cog):
     # https://docs.pycord.dev/en/master/api/data_classes.html#discord.Permissions
     @commands.slash_command(name="setup", default_member_permissions=discord.Permissions(manage_roles=True, manage_messages=True))
     async def setup(self, ctx):
-        modal = mongo.ChannelUpdateModal(ctx.guild.id)
+        modal = mongo.ConfigUpdateModal(ctx.guild.id)
         await ctx.send_modal(modal)
 
     @commands.slash_command(name="actionform")
     async def action_form(self, ctx):
         """staff action form"""
-        channel_id = mongo.get_channel(ctx.guild.id, mongo.CHANNELS.ACTION_REPORTS.value)
+        channel_id = mongo.get_setting(ctx.guild.id, mongo.CONFIG.CHANNEL_ACTION_REPORTS.key)
         if channel_id is None:
-            await ctx.respond(f"{ mongo.CHANNELS.ACTION_REPORTS.value } channel not set")
+            await ctx.respond(f"{ mongo.CONFIG.CHANNEL_ACTION_REPORTS.key } channel not set")
             return
 
         action_form_channel = await self.bot.fetch_channel(int(channel_id))
@@ -109,9 +109,9 @@ class Moderation(commands.Cog):
 
     @commands.message_command(name="msgactionform")
     async def message_action_form(self, ctx, message: discord.Message):
-        channel_id = mongo.get_channel(ctx.guild.id, mongo.CHANNELS.ACTION_REPORTS.value)
+        channel_id = mongo.get_setting(ctx.guild.id, mongo.CONFIG.CHANNEL_ACTION_REPORTS.key)
         if channel_id is None:
-            await ctx.respond(f"{ mongo.CHANNELS.ACTION_REPORTS.value } channel not set")
+            await ctx.respond(f"{ mongo.CONFIG.CHANNEL_ACTION_REPORTS.key } channel not set")
             return
 
         action_form_channel = await self.bot.fetch_channel(int(channel_id))

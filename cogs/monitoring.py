@@ -21,11 +21,11 @@ class Monitor(commands.Cog):
             return
 
 
-        log_id = mongo.get_channel(Monitor.get_guild(before, after), "vc_updates_log")
+        log_id = mongo.get_setting(Monitor.get_guild(before, after), "vc_updates_log")
         if log_id is None:
             print(f"{before.channel.guild.name} ({before.channel.guild.id}) does not have vc_updates_log channel set")
             return
-        log_channel = self.bot.get_channel(int(log_id))
+        log_channel = self.bot.get_setting(int(log_id))
 
         embed = discord.Embed()
 
@@ -48,13 +48,13 @@ class Monitor(commands.Cog):
 
 
     async def on_voice_channel_status_update(self, channel, before, after):
-        log_id = mongo.get_channel(channel.guild.id, "vc_updates_log")
+        log_id = mongo.get_setting(channel.guild.id, "vc_updates_log")
         if log_id is None:
             print(f"{channel.guild.name} ({channel.guild.id}) does not have vc_updates_log channel set")
             return
 
         # print(log_id)
-        log_channel = self.bot.get_channel(int(log_id))
+        log_channel = self.bot.get_setting(int(log_id))
         # print(log_channel)
 
         if before == after:

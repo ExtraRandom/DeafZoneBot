@@ -17,7 +17,7 @@ AUTO_DELETE_LONG = 30
 class RolePing(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        # self.check_loop.start()
+        self.check_loop.start()
 
 
     async def lfg_autocomplete(self, ctx: AutocompleteContext):
@@ -94,22 +94,32 @@ class RolePing(commands.Cog):
         await ctx.respond(msg)
         return
 
-    @tasks.loop(seconds=10)
+    @tasks.loop(seconds=5)
     async def check_loop(self):
         if self.bot.is_ready():
             # print("practice check")
             now = int(time.time())
             query = {"ts": {"$lte": now}}
-            res = mongo.col_practice.find(query)
+            res = mongo.col_practice.find_one(query)
             if res is None:
                 return
+            if res is not None:
+                if res is mongo.ERRORS.NO_CONNECTION:
+                    return
+            print(res)
 
-            channel = await self.bot.fetch_channel(self.channel_for_ping_id)
-            for r in res:
-                print(r)
-                await channel.send(f"<@role ping> '{r['what']}' practice scheduled by <@{r['_id']}> begins now! "
-                                   f"\n-# <t:{r['ts']}:R>")
-                mongo.col_practice.delete_one(r)
+            channel_id = mongo.get_setting(res['guild'], mongo.CONFIG.CHANNEL_PRACTISE_PING.key)
+            if channel_id is None:
+                err_chan: discord.TextChannel = await self.bot.fetch_channel(1546737924526186586)
+                await err_chan.send(f"{mongo.CONFIG.CHANNEL_PRACTISE_PING.key} is not set for guild '{res['guild']}'")
+                return
+
+            channel = await self.bot.fetch_channel(channel_id)
+            #for r in res:
+            #    print(r)
+            await channel.send(f"<@&{mongo.get_setting(res['guild'], mongo.CONFIG.ROLE_PRACTISE_PING.key)}> '{res['what']}' practice scheduled by <@{res['_id']}> begins now! "
+                               f"\n-# <t:{res['ts']}:R>")
+            mongo.col_practice.delete_one(res)
 
     class ExistingPracticeView(discord.ui.DesignerView):
         class ExistingRow(discord.ui.ActionRow):
@@ -123,6 +133,13 @@ class RolePing(commands.Cog):
             @discord.ui.button(label="Delete", style=discord.ButtonStyle.danger)
             async def delete_callback(self, button, interaction):
                 existing = mongo.check_for_existing_practice(interaction.user.id)
+                if existing is mongo.ERRORS.NO_CONNECTION:
+                    await interaction.message.edit(content="An error occurred whilst connecting to the database")
+                    await self.parent.remove()
+                    self.parent.stop()
+                    await interaction.respond("Unable to reach the database, the scheduled practice was **not** deleted.\n"
+                                              "Please try again later.")
+
                 mongo.col_practice.delete_one(existing)
                 await interaction.message.edit(
                     content=f"The following Practice ping was ***deleted***:\n"
@@ -218,7 +235,8 @@ class RolePing(commands.Cog):
             doc = {
                 "_id": str(interaction.user.id),
                 "ts": int(then.timestamp()),
-                "what": self.input_language.item.value
+                "what": self.input_language.item.value,
+                "guild": str(interaction.guild.id)
             }
             print(doc)
 
@@ -280,9 +298,14 @@ class RolePing(commands.Cog):
 
     @commands.slash_command(name="practice")
     async def practise(self, ctx: discord.ApplicationContext):
-        testing_id = 1525770074059702373
+        # testing_id = 1525770074059702373
 
         check = mongo.check_for_existing_practice(ctx.user.id)
+        if check == mongo.ERRORS.NO_CONNECTION:
+            await ctx.respond("An error occurred whilst trying to connect to the database. "
+                              "\nPlease try again later.")
+            return
+
         if check is not None:
             existing_view = self.ExistingPracticeView()
             await ctx.respond(
@@ -291,7 +314,6 @@ class RolePing(commands.Cog):
                 f"**When?:** <t:{check['ts']}:F> (<t:{check['ts']}:R>)\n"
                 f"-# Interaction will automatically timeout in 30 seconds",
                 view=existing_view)
-
             return
 
 

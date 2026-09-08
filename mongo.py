@@ -3,46 +3,72 @@ import discord
 import cogs.utils.IO as IO
 from enum import Enum
 
+from functools import wraps
+from pymongo.errors import PyMongoError, ServerSelectionTimeoutError
+
 url = IO.fetch_mongo_url_from_settings()
-client = MongoClient(url)
+client = MongoClient(url, timeoutMS=2000)
 
 db = client['main']
 
 col_practice = db['practice']
-col_channels = db['channels']
+col_config = db['config']
 
-class CHANNELS(Enum):
-    VC_UPDATES = "vc_updates_log"
-    ACTION_REPORTS = "action_report_channel"
+# CURRENTLY:
+# role pings (game role id's only) and verification channel and roles id's are hardcoded
+# moderation and monitoring channels id's are in database, can be changed easily
 
+class CONFIG(Enum):
+    CHANNEL_VC_UPDATES = ("CHANNEL_vc_updates_log", "VC Log Channel", discord.ui.ChannelSelect)
+    CHANNEL_ACTION_REPORTS = ("CHANNEL_action_report", "Action Reports Channel", discord.ui.ChannelSelect)
+    CHANNEL_PRACTISE_PING = ("CHANNEL_practise_ping", "Practise Ping Channel", discord.ui.ChannelSelect)
 
+    ROLE_PRACTISE_PING = ("ROLE_practise_ping", "Practise Role (to ping)", discord.ui.RoleSelect)
 
-"""CHANNELS = {
-    "vc_updates_log",
-    "action_report_channel"
-}"""
+    def __init__(self, key, label, select_type):
+        self.key = key
+        self.label = label
+        self.select_type = select_type
 
+class ERRORS(Enum):
+    NO_CONNECTION = 1
 
+def mongo_error_handler(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except ServerSelectionTimeoutError:
+            print("MongoDB connection timed out")
+            return ERRORS.NO_CONNECTION
+        except PyMongoError as e:
+            print(f"MongoDB error: {e}")
+            return ERRORS.NO_CONNECTION
+
+    return wrapper
+
+@mongo_error_handler
 def check_for_existing_practice(user_id):
     practice = col_practice.find_one({'_id': str(user_id)})
     return practice
 
-def get_server_channels(server_id):
+@mongo_error_handler
+def get_server_config(server_id):
     server_id = str(server_id)
-    doc = col_channels.find_one({'_id': server_id})
+    doc = col_config.find_one({'_id': server_id})
 
     if doc is None:
         doc = {"_id": server_id}
-        col_channels.insert_one(doc)
+        col_config.insert_one(doc)
 
     missing = {
-        channel.value: None
-        for channel in CHANNELS
-        if channel.value not in doc
+        channel.key: None
+        for channel in CONFIG
+        if channel.key not in doc
     }
 
     if missing:
-        col_channels.update_one(
+        col_config.update_one(
             {"_id": server_id},
             {"$set": missing}
         )
@@ -50,58 +76,97 @@ def get_server_channels(server_id):
 
     return doc
 
-def get_channel(server_id, channel_type):
+def get_setting(server_id, setting):
     if server_id is None:
         return None
-    document = get_server_channels(server_id)
-    return document.get(channel_type)
+    document = get_server_config(server_id)
+    return document.get(setting)
 
-def set_channel(server_id, channel, channel_id):
-    if channel not in CHANNELS:
-        raise ValueError(f"Unknown channel type: {channel}")
+def set_setting(server_id, setting, new_setting_value):
+    if setting not in CONFIG:
+        raise ValueError(f"Unknown channel type: {setting}")
 
-    col_channels.update_one(
+    col_config.update_one(
         {"_id": str(server_id)},
-        {"$set": {channel: str(channel_id)}},
+        {"$set": {setting: str(new_setting_value)}},
         upsert=True,
     )
 
+def ensure_guild_config(guild_id):
+    guild_id = str(guild_id)
 
-class ChannelUpdateModal(discord.ui.DesignerModal):
+    data = col_config.find_one({"_id": guild_id})
+
+    if data is None:
+        data = {"_id": guild_id}
+
+    missing = {
+        setting.key: None
+        for setting in CONFIG
+        if setting.key not in data
+    }
+
+    if missing:
+        col_config.update_one(
+            {"_id": guild_id},
+            {"$set": missing},
+            upsert=True
+        )
+
+
+
+class ConfigUpdateModal(discord.ui.DesignerModal):
     def __init__(self, server_id):
-        super().__init__(title="test")
+        super().__init__(title="Config Setup")
 
-        data = get_server_channels(server_id)
+        self.inputs = {}
+        self.server_id = server_id
+
+        data = get_server_config(server_id)
         print(data)
 
-        vc = data.get(CHANNELS.VC_UPDATES.value)
-        vc_default = None
-        if vc is not None:
-            vc_default = discord.SelectDefaultValue(id=int(vc), type=discord.SelectDefaultValueType.channel)
+        for setting in CONFIG:
+            value = data.get(setting.key)
 
-        self.vc_log_channel = discord.ui.Label(
-            "VC Log Channel",
-            discord.ui.ChannelSelect(
-                required=False, default_values=[vc_default] if vc_default else [],
-            )
-        )
-        self.add_item(self.vc_log_channel)
+            default = [
+                discord.SelectDefaultValue(
+                    id=int(value),
+                    type=(
+                        discord.SelectDefaultValueType.channel
+                        if setting.select_type is discord.ui.ChannelSelect
+                        else discord.SelectDefaultValueType.role
+                    )
+                )
+            ] if value else []
 
-        ar = data.get(CHANNELS.ACTION_REPORTS.value)
-        ar_default = None
-        if ar is not None:
-            ar_default = discord.SelectDefaultValue(id=int(ar), type=discord.SelectDefaultValueType.channel)
-        self.action_report_channel = discord.ui.Label(
-            "Action Reports Channel",
-            discord.ui.ChannelSelect(
-                required=False, default_values=[ar_default] if ar_default else [],
+            select = setting.select_type(
+                required=False,
+                default_values=default
             )
-        )
-        self.add_item(self.action_report_channel)
+
+            label = discord.ui.Label(setting.label, select)
+
+            self.add_item(label)
+            self.inputs[setting] = label
+
+
 
     async def callback(self, interaction: discord.Interaction):
-        vc_log = self.vc_log_channel.item.values[0]
-        action = self.action_report_channel.item.values[0]
+        update = {}
 
-        await interaction.response.send_message(f"vc log selected was {vc_log}, {vc_log.id}\n"
-                                                f"action channel selected was {action}, {action.id}")
+        for config, label in self.inputs.items():
+            values = label.item.values
+
+            update[config.key] = (
+                str(values[0].id)
+                if values
+                else None
+            )
+
+        col_config.update_one(
+            {"_id": str(self.server_id)},
+            {"$set": update},
+            upsert=True
+        )
+
+        await interaction.response.send_message(update)

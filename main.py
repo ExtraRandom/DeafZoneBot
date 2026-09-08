@@ -1,5 +1,6 @@
 from discord.ext import commands
 import datetime
+import mongo
 from cogs.utils import IO, errors, ez_utils
 from cogs.utils.logger import Logger
 import discord
@@ -61,6 +62,9 @@ class DeafZoneBot(commands.Bot):
                          "{}\n"
                          "".format(login_msg))
         print(login_msg)
+
+        for guild in self.guilds:
+            mongo.ensure_guild_config(guild.id)
 
     async def on_message(self, message):
         bot_msg = message.author.bot
