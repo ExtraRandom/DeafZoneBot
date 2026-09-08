@@ -19,6 +19,7 @@ class AntiSpam(commands.Cog):
         for img_path in Path("cogs/data/bad_images").glob("*"):
             img = Image.open(img_path)
             self.scam_hashes[img_path.name] = imagehash.phash(img)
+            # print(self.scam_hashes[img_path.name])
 
         print(f"Added {len(self.scam_hashes)} images hashes to check")
 

@@ -23,7 +23,7 @@ class General(commands.Cog):
         # "%I:%M%p %Z" # 12 hour
 
 
-    @commands.slash_command(name="timezones")
+    @commands.slash_command(name="timezones", description="List some times in a few timezones")
     async def timezone_info(self, ctx):
         await ctx.defer()
 

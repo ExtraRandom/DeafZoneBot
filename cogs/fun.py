@@ -8,11 +8,7 @@ class Fun(commands.Cog):
         self.bot = bot
 
     @commands.slash_command(
-        name="pick",
-        integration_types={
-            discord.IntegrationType.guild_install,
-            discord.IntegrationType.user_install,
-        }
+        name="pick"
     )
     async def pick_random(self, ctx,
                           first_option: discord.Option(str, "The first option to pick from", required=True),

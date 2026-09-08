@@ -44,7 +44,7 @@ def user_info_embed(target: discord.Member):
                                                  timefmt.time_ago(target.joined_at, brief=True)))
 
     result.set_footer(text="ID: {}".format(target.id))
-    result.timestamp = datetime.utcnow()
+    result.timestamp = datetime.now()
 
     return result
 
