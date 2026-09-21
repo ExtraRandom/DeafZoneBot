@@ -94,7 +94,7 @@ class Moderation(commands.Cog):
         modal = mongo.ConfigUpdateModal(ctx.guild.id)
         await ctx.send_modal(modal)
 
-    @commands.slash_command(name="actionform")
+    @commands.slash_command(name="actionform", default_member_permissions=discord.Permissions(manage_roles=True, manage_messages=True))
     async def action_form(self, ctx):
         """staff action form"""
         channel_id = mongo.get_setting(ctx.guild.id, mongo.CONFIG.CHANNEL_ACTION_REPORTS.key)
@@ -107,7 +107,7 @@ class Moderation(commands.Cog):
         modal = self.ActionModal(action_form_channel)
         await ctx.send_modal(modal)
 
-    @commands.message_command(name="msgactionform")
+    @commands.message_command(name="msgactionform", default_member_permissions=discord.Permissions(manage_roles=True, manage_messages=True))
     async def message_action_form(self, ctx, message: discord.Message):
         channel_id = mongo.get_setting(ctx.guild.id, mongo.CONFIG.CHANNEL_ACTION_REPORTS.key)
         if channel_id is None:

@@ -8,3 +8,5 @@
 /.ven*
 
 /cogs/removed/*.*
+ignorethis.txt
+docker-compose.yaml
