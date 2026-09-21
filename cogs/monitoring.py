@@ -10,9 +10,9 @@ class Monitor(commands.Cog):
     @staticmethod
     def get_guild(before, after):
         if before.channel:
-            return before.channel.guild.id
+            return before.channel.guild
         if after.channel:
-            return after.channel.guild.id
+            return after.channel.guild
         return None
 
     async def on_voice_state_update(self, member: discord.Member, before: discord.VoiceState, after: discord.VoiceState):
@@ -20,12 +20,16 @@ class Monitor(commands.Cog):
             # print("was a voice state change rather than channel change, skipping logging")
             return
 
+        guild_id = Monitor.get_guild(before, after).id
+        log_id = mongo.get_setting(guild_id, mongo.CONFIG.CHANNEL_VC_UPDATES.key)
+        # print(guild_id)
+        # print(log_id)
 
-        log_id = mongo.get_setting(Monitor.get_guild(before, after), "vc_updates_log")
         if log_id is None:
-            print(f"{before.channel.guild.name} ({before.channel.guild.id}) does not have vc_updates_log channel set")
+            guild = Monitor.get_guild(before, after)
+            print(f"{guild.name} ({guild.id}) does not have vc_updates_log channel set")
             return
-        log_channel = self.bot.get_setting(int(log_id))
+        log_channel = self.bot.get_channel(int(log_id))
 
         embed = discord.Embed()
 
@@ -48,13 +52,13 @@ class Monitor(commands.Cog):
 
 
     async def on_voice_channel_status_update(self, channel, before, after):
-        log_id = mongo.get_setting(channel.guild.id, "vc_updates_log")
+        log_id = mongo.get_setting(channel.guild.id, mongo.CONFIG.CHANNEL_VC_UPDATES.key)
         if log_id is None:
             print(f"{channel.guild.name} ({channel.guild.id}) does not have vc_updates_log channel set")
             return
 
         # print(log_id)
-        log_channel = self.bot.get_setting(int(log_id))
+        log_channel = self.bot.get_channel(int(log_id))
         # print(log_channel)
 
         if before == after:
