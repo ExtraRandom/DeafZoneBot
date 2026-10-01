@@ -38,10 +38,15 @@ class Moderation(commands.Cog):
 
             self.input_action_taken = discord.ui.Label(
                 "What action was taken?",
-                discord.ui.InputText(required=True, style=discord.InputTextStyle.long, max_length=3000),
+                discord.ui.InputText(required=True, style=discord.InputTextStyle.short),
             )
             self.add_item(self.input_action_taken)
 
+            self.input_action_reason = discord.ui.Label(
+                "Reason for Action (optional)",
+                discord.ui.InputText(required=False, style=discord.InputTextStyle.long, max_length=3000),
+            )
+            self.add_item(self.input_action_reason)
 
             self.input_image = discord.ui.Label(
                 "Screenshot (Optional)",
@@ -60,6 +65,7 @@ class Moderation(commands.Cog):
         async def callback(self, interaction: discord.Interaction):
             user: discord.User = self.input_user.item.values[0]
             action = self.input_action_taken.item.value
+            reason = self.input_action_reason.item.value
 
             image = self.input_image.item.values[0] if self.input_image.item.values else None
 
@@ -79,10 +85,14 @@ class Moderation(commands.Cog):
             now = datetime.datetime.now()
             embed.timestamp = now
 
+            if reason:
+                embed.add_field(name="Reason", value=reason)
+
             if image:
                 embed.set_image(url=image)
             if url:
                 embed.add_field(name="Message Link", value=str(url))
+
 
             msg = await self.log_channel.send(embed=embed)
 
