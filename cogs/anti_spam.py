@@ -6,6 +6,8 @@ from pathlib import Path
 import aiohttp
 import io
 
+import mongo
+
 
 class AntiSpam(commands.Cog):
     def __init__(self, bot):
@@ -38,11 +40,20 @@ class AntiSpam(commands.Cog):
         if message.author.bot:
             return
 
+        anti_spam_log_id = mongo.get_setting(message.guild.id, mongo.CONFIG.CHANNEL_ANTISPAM_LOG.key)
+        anti_spam_log = None
+
+        if anti_spam_log_id is not None:
+            anti_spam_log = self.bot.get_channel(anti_spam_log_id)
+
+
         # TODO decide on check against images that are linked (maybe only if a discord link?)
         for file in message.attachments:
             # print(file.content_type)
             lowest_distance = 100
             msg = ""
+            # log_msg = ""
+            # log_img = None
 
             if file.content_type in ["image/webp", "image/png", "image/jpeg"]:
                 # check against known bad images
@@ -56,13 +67,18 @@ class AntiSpam(commands.Cog):
                         lowest_distance = distance
 
                     if distance == 0:
-                        msg+= f"image is identical to a known bad image (dist: {distance}) {image_hash}\n"
+                        msg+= f"Image is identical to a known bad image\n"
+                        # log_msg+= f"Image is identical to a known bad image (dist: {distance}) {image_hash}\n"
+                        # log_img = uploaded_img
                     elif 6 > distance > 1:
-                        msg+= f"image is extremely similar to a known bad image (dist: {distance}) {image_hash}\n"
+                        msg+= f"Image is extremely similar to a known bad image\n"
+                        # msg += f"Image is extremely similar to a known bad image (dist: {distance}) {image_hash}\n"
                     elif 11 > distance > 6:
-                        msg+= f"image is somewhat similar to a known bad image (dist: {distance}) {image_hash}\n"
+                        msg+= f"Image is somewhat similar to a known bad image\n"
+                        # msg+= f"Image is somewhat similar to a known bad image (dist: {distance}) {image_hash}\n"
                     elif 19 > distance > 11:
-                        msg+= f"image is possibly related or similar to a known bad image (dist: {distance}) {image_hash}\n"
+                        pass
+                        # msg+= f"image is possibly related or similar to a known bad image (dist: {distance}) {image_hash}\n"
                     elif distance > 19:
                         pass
                         # msg += f"image is likely unrelated to a known bad image (dist: {distance})\n"
