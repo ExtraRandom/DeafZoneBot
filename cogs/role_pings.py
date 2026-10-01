@@ -110,7 +110,7 @@ class RolePing(commands.Cog):
 
             channel_id = mongo.get_setting(res['guild'], mongo.CONFIG.CHANNEL_PRACTISE_PING.key)
             if channel_id is None:
-                err_chan: discord.TextChannel = await self.bot.fetch_channel(1546737924526186586)
+                err_chan: discord.TextChannel = self.bot.get_channel(1546737924526186586)
                 await err_chan.send(f"{mongo.CONFIG.CHANNEL_PRACTISE_PING.key} is not set for guild '{res['guild']}'")
                 return
 

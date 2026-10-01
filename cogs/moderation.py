@@ -75,7 +75,7 @@ class Moderation(commands.Cog):
             embed.set_footer(text=f"Action Taken by {interaction.user.display_name}", icon_url=interaction.user.display_avatar)
 
             # embed.add_field(name="Action Description", value=action)
-            embed.add_field(name="Taken Against", value=f"{str(user)}\n{user.mention}")
+            embed.add_field(name="Taken Against", value=f"{str(user)}\n{user.mention}\nID: {user.id}")
             now = datetime.datetime.now()
             embed.timestamp = now
 

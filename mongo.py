@@ -22,6 +22,7 @@ class CONFIG(Enum):
     CHANNEL_VC_UPDATES = ("CHANNEL_vc_updates_log", "VC Log Channel", discord.ui.ChannelSelect)
     CHANNEL_ACTION_REPORTS = ("CHANNEL_action_report", "Action Reports Channel", discord.ui.ChannelSelect)
     CHANNEL_PRACTISE_PING = ("CHANNEL_practise_ping", "Practise Ping Channel", discord.ui.ChannelSelect)
+    CHANNEL_ANTISPAM_LOG = ("CHANNEL_antispam_log", "Anti-spam Log Channel", discord.ui.ChannelSelect)
 
     ROLE_PRACTISE_PING = ("ROLE_practise_ping", "Practise Role (to ping)", discord.ui.RoleSelect)
 
@@ -169,4 +170,18 @@ class ConfigUpdateModal(discord.ui.DesignerModal):
             upsert=True
         )
 
-        await interaction.response.send_message(update)
+        msg = "Updated, New Config: \n"
+        for updated in update:
+            start_mod = ""
+            end_mod = ""
+
+            if str(updated).startswith("CHANNEL_"):
+                start_mod = "<#"
+                end_mod = ">"
+            elif str(updated).startswith("ROLE_"):
+                start_mod = "<@&"
+                end_mod = ">"
+
+            msg += f"{updated} - {start_mod}{update[updated]}{end_mod}\n"
+
+        await interaction.response.send_message(msg)
