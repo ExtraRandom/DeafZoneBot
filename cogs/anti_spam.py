@@ -40,11 +40,11 @@ class AntiSpam(commands.Cog):
         if message.author.bot:
             return
 
-        anti_spam_log_id = mongo.get_setting(message.guild.id, mongo.CONFIG.CHANNEL_ANTISPAM_LOG.key)
-        anti_spam_log = None
+        # anti_spam_log_id = mongo.get_setting(message.guild.id, mongo.CONFIG.CHANNEL_ANTISPAM_LOG.key)
+        # anti_spam_log = None
 
-        if anti_spam_log_id is not None:
-            anti_spam_log = self.bot.get_channel(anti_spam_log_id)
+        # if anti_spam_log_id is not None:
+        #    anti_spam_log = self.bot.get_channel(anti_spam_log_id)
 
 
         # TODO decide on check against images that are linked (maybe only if a discord link?)

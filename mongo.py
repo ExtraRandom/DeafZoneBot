@@ -14,6 +14,8 @@ db = client['main']
 col_practice = db['practice']
 col_config = db['config']
 
+col_modlog = db['modlog']
+
 # CURRENTLY:
 # role pings (game role id's only) and verification channel and roles id's are hardcoded
 # moderation and monitoring channels id's are in database, can be changed easily
